@@ -3,35 +3,29 @@
     <Name>ReproFeatureDatasetTopologyCreateAsyncIssue</Name>
     <Description>ReproFeatureDatasetTopologyCreateAsyncIssue description</Description>
     <Image>Images\AddinDesktop32.png</Image>
-    <Author>michael.reutebuch</Author>
-    <Company>Acme</Company>
     <Date>11/7/2019 6:02:06 PM, 2019</Date>
     <Subject>Geodatabase</Subject>
-    <!-- Note subject can be one or more of these topics:
-                    Content, Framework, Editing, Geodatabase, Geometry, Geoprocessing, Layouts, Map Authoring, Map Exploration -->
   </AddInInfo>
   <modules>
     <insertModule id="ReproFeatureDatasetTopologyCreateAsyncIssue_Module" className="ReproModule" autoLoad="false" caption="ReproIssue">
-      <!-- uncomment to have the control hosted on a separate tab-->
       <tabs>
         <tab id="ReproFeatureDatasetTopologyCreateAsyncIssue_Tab" caption="Repro Issue" keytip="R">
           <group refID="ReproFeatureDatasetTopologyCreateAsyncIssue_Group" />
         </tab>
       </tabs>
       <groups>
-        <!-- comment this out if you have no controls on the Addin tab to avoid
-              an empty group-->
         <group id="ReproFeatureDatasetTopologyCreateAsyncIssue_Group" caption="Repro Tools" keytip="R">
-          <!-- host controls within groups -->
           <button refID="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNewProjectButton" size="large" />
-          <button refID="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateFeaturesButton" size="large" />
-          <button refID="ReproFeatureDatasetTopologyCreateAsyncIssue_CreateNewProjectWindow" size="large" />
+          <button refID="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateTopologyFeaturesButton" size="large" />
+          <button refID="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNonTopologyFeaturesButton" size="large" />
+          <button refID="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNonDatasetFeaturesButton" size="large" />
         </group>
       </groups>
       <controls>
-        <!-- add your controls here -->
-        <button id="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNewProjectButton" caption="Create New Project" className="ReproFeatureDatasetTopologyCreateAsyncIssue.UI.CreateNewProjectButton" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue32.png" keytip="P" />
-        <button id="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateDatasetFeaturesButton" caption="Create Features" className="ReproFeatureDatasetTopologyCreateAsyncIssue.UI.CreateDatasetFeaturesButton" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonPurple32.png" keytip="F" />
+        <button id="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNewProjectButton" caption="Create New Project" className="ReproFeatureDatasetTopologyCreateAsyncIssue.UI.CreateNewProjectButton" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue32.png" keytip="N" />
+        <button id="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateTopologyFeaturesButton" caption="Create Topology Features" className="ReproFeatureDatasetTopologyCreateAsyncIssue.UI.CreateTopologyFeaturesButton" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonPurple32.png" keytip="T" />
+        <button id="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNonTopologyFeaturesButton" caption="Create Non-Topology Dataset Features" className="ReproFeatureDatasetTopologyCreateAsyncIssue.UI.CreateNonTopologyDatasetFeaturesButton" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonPurple32.png" keytip="D" />
+        <button id="ReproFeatureDatasetTopologyCreateAsyncIssue_UI_CreateNonDatasetFeaturesButton" caption="Create Non-Dataset Features" className="ReproFeatureDatasetTopologyCreateAsyncIssue.UI.CreateNonDatasetFeaturesButton" loadOnClick="true" smallImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonBlue16.png" largeImage="pack://application:,,,/ArcGIS.Desktop.Resources;component/Images/GenericButtonPurple32.png" keytip="F" />
       </controls>
     </insertModule>
   </modules>

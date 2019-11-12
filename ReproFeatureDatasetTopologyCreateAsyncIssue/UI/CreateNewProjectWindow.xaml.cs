@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using ActiproSoftware.Windows.Extensions;
 using ArcGIS.Core.Data;
 using ArcGIS.Core.Geometry;
@@ -135,13 +136,10 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
                 await ZoomToExtents();
 
                 await Project.Current.SaveAsync();
-
-                DialogResult = true;
-                this.Close();
             }
         }
 
-        private async Task<bool> RemoveProjectCreatedDatabase()
+        private async Task RemoveProjectCreatedDatabase()
         {
             var esriGeodatabaseName = NewProjectName + ".gdb";
 
@@ -154,7 +152,6 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
                 {
                     using (var datastore = gdbProjectItem.GetDatastore())
                     {
-
                         //Unsupported datastores (non File GDB and non Enterprise GDB) will be of type UnknownDatastore
                         if (datastore is UnknownDatastore)
                             continue;
@@ -169,22 +166,26 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             });
 
             //Found it so remove it
-            if (geodatabaseItemToRemove != null)
-                return await QueuedTask.Run(() => Project.Current.RemoveItem(geodatabaseItemToRemove));
-
-            return false;
+            if(geodatabaseItemToRemove != null)
+            {
+                if(await QueuedTask.Run(() => Project.Current.RemoveItem(geodatabaseItemToRemove)))
+                    Debug.WriteLine($"File geodatabase {geodatabaseItemToRemove} removed.");
+                else
+                    Debug.WriteLine($"FAIL: Could not remove file geodatabase {geodatabaseItemToRemove}.");
+            }
         }
 
-        private async Task<bool> DeleteProjectCreatedDatabase()
+        private async Task DeleteProjectCreatedDatabase()
         {
             var esriGeodatabaseName = NewProjectName + ".gdb";
             var esriGeodatabaseFullPath = Path.Combine(ProjectFolder, NewProjectName, esriGeodatabaseName);
 
-            return !(await QueuedTask.Run(() =>
-            {
-                var args = Geoprocessing.MakeValueArray(esriGeodatabaseFullPath);
-                return Geoprocessing.ExecuteToolAsync("management.Delete", args);
-            })).IsFailed;
+            var args = await QueuedTask.Run(() => Geoprocessing.MakeValueArray(esriGeodatabaseFullPath));
+
+            if(!(await Geoprocessing.ExecuteToolAsync("management.Delete", args)).IsFailed)
+                Debug.WriteLine($"File geodatabase {esriGeodatabaseName} deleted");
+            else
+                Debug.WriteLine($"FAIL: Could not delete file geodatabase {esriGeodatabaseName}");
         }
 
         private async Task<bool> CreateProject()
@@ -201,17 +202,16 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             return mreProject != null;
         }
 
-        private async Task<bool> SetDefaultGeodatabase()
+        private async Task SetDefaultGeodatabase()
         {
             await QueuedTask.Run(() => { Project.Current.SetDefaultGeoDatabasePath(DefaultGeodatabasePath); });
-
-            return true;
+            Debug.WriteLine($"Default geodatabase updated. New path: {Project.Current.DefaultGeodatabasePath} ");
         }
 
         private async Task UpdateCoordinateSystem()
         {
             // Update for all the feature classes in the geodatabase
-            Debug.WriteLine($"Update Feature Datase projection success? {await UpdateFeatureDatasetProjection()}");
+            Debug.WriteLine($"Update Feature Dataset projection success? {await UpdateFeatureDatasetProjection()}");
             
             foreach(var successTuple in await UpdateFeatureClassProjection())
                 Debug.WriteLine($"Update {successTuple.FeatureClassName} projection success? {successTuple.Success}");
@@ -264,19 +264,27 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
         
         private async Task UpdateMapProjection()
         {
-            var mapProjectItems = Project.Current.GetItems<MapProjectItem>();
+            var mapProjectItems = Project.Current.GetItems<MapProjectItem>().ToList();
 
-            await QueuedTask.Run(() =>
+            var results = await QueuedTask.Run(() =>
             {
+                var createMapPaneTasks = new List<Task<IMapPane>>();
+
                 foreach (var mapProjectItem in mapProjectItems)
                 {
                     var map = mapProjectItem.GetMap();
                     map.SetSpatialReference(ProjectSpatialReference);
+                    Debug.WriteLine($"Spatial reference for map {map.Name} updated: {ProjectSpatialReference.Name}");
+                    createMapPaneTasks.Add(FrameworkApplication.Panes.CreateMapPaneAsync(mapProjectItem.GetMap()));
                 }
+
+                return Task.WhenAll(createMapPaneTasks);
             });
 
-            var mapPane = FrameworkApplication.Panes.OfType<IMapPane>().FirstOrDefault(i => i.Caption == "Map") as Pane;
-            mapPane?.Activate();
+            foreach(var result in results)
+            {
+                Debug.WriteLine($"Map {result.Caption} opened.");
+            }
         }
 
         private async Task ZoomToExtents()
@@ -310,7 +318,20 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 
         private async void OK_Click(object sender, RoutedEventArgs e)
         {
-            await CreateNewProject();
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                this.IsEnabled = false;
+                await CreateNewProject();
+                this.IsEnabled = true;
+
+                DialogResult = true;
+                this.Close();
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
         }
 
         #endregion

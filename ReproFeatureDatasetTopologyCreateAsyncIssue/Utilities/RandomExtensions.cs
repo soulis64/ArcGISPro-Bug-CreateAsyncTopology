@@ -22,7 +22,7 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
         }
 
         /// <summary>
-        /// /Generate a random coordinate (only x,y values)  within the provided envelope.
+        /// Generate a random coordinate (only x,y values)  within the provided envelope.
         /// </summary>
         /// <param name="random">Instance of a random class.</param>
         /// <param name="withinThisExtent">Area of interest in which the random coordinate will be created.</param>

@@ -126,6 +126,7 @@
     <AddInContent Include="DarkImages\AddInDesktop32.png" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\CreateNonTopologyDatasetFeaturesButton.cs" />
     <Compile Include="UI\CreateNonDatasetFeaturesButton.cs" />
     <Compile Include="UI\CreateNewProjectWindow.xaml.cs">
       <DependentUpon>CreateNewProjectWindow.xaml</DependentUpon>
@@ -133,7 +134,8 @@
     <Compile Include="ReproModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\CreateNewProjectButton.cs" />
-    <Compile Include="UI\CreateDatasetFeaturesButton.cs" />
+    <Compile Include="UI\CreateTopologyFeaturesButton.cs" />
+    <Compile Include="Utilities\FeatureHelper.cs" />
     <Compile Include="Utilities\GeometryHelper.cs" />
     <Compile Include="Utilities\RandomExtensions.cs" />
   </ItemGroup>

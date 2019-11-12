@@ -5,12 +5,12 @@ using ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities;
 
 namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 {
-    internal class CreateNonDatasetFeaturesButton : Button
+    internal class CreateTopologyFeaturesButton : Button
     {
         protected override async void OnClick()
         {
-            var success = await QueuedTask.Run(() => FeatureHelper.GetNonDatasetFeatureLayers().GenerateRandomPolygons());
-            Debug.WriteLine($"Created non-dataset features? {success}");
+            var success = await QueuedTask.Run(() => FeatureHelper.GetTopologyFeatureLayers().GenerateRandomPolygons());
+            Debug.WriteLine($"Created topology features? {success}");
         }
     }
 }
