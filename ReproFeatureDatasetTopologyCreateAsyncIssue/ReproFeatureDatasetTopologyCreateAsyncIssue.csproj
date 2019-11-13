@@ -142,6 +142,8 @@
   <ItemGroup>
     <Folder Include="Data\MRE_Project\Index\MRE_Project\" />
     <Folder Include="Data\MRE_Project\Index\Thumbnail\" />
+    <Folder Include="Data\NoTopo_MRE_Project\Index\NoTopo_MRE_Project\" />
+    <Folder Include="Data\NoTopo_MRE_Project\Index\Thumbnail\" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\GenericButtonBlue16.png" />
@@ -252,6 +254,70 @@
     <None Include="Data\MRE_Project\MRE_Project.gdb\timestamps" />
     <None Include="Data\MRE_Project\MRE_Project.tbx" />
     <None Include="Data\MRE_Template.aptx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.aprx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000001.freelist" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000001.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000001.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000001.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000001.TablesByName.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000002.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000002.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000003.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000003.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000003.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.CatItemsByPhysicalName.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.CatItemsByType.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.FDO_UUID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.freelist" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000004.spx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000005.CatItemTypesByName.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000005.CatItemTypesByParentTypeID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000005.CatItemTypesByUUID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000005.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000005.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000005.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.CatRelsByDestinationID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.CatRelsByOriginID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.CatRelsByType.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.FDO_UUID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.freelist" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000006.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.CatRelTypesByBackwardLabel.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.CatRelTypesByDestItemTypeID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.CatRelTypesByForwardLabel.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.CatRelTypesByName.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.CatRelTypesByOriginItemTypeID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.CatRelTypesByUUID.atx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000007.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000009.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000009.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000009.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000009.spx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000b.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000b.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000b.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000b.spx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000c.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000c.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000c.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a0000000c.spx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000011.gdbindexes" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000011.gdbtable" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000011.gdbtablx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\a00000011.spx" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\gdb" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.gdb\timestamps" />
+    <None Include="Data\NoTopo_MRE_Project\NoTopo_MRE_Project.tbx" />
+    <None Include="Data\NoTopo_MRE_Template.aptx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

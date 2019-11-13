@@ -34,13 +34,20 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
         private string _newProjectName = "New Project";
         private string _projectFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private SpatialReference _projectSpatialReference;
+        private bool _useTopology;
 
         #endregion
 
         #region  Properties
 
-        public string TemplateFile => Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().CodeBase).Replace("file:\\", "").Replace("file:///", ""), "data", "MRE_Template.aptx");
-        
+        private static string TemplatePath => Path.Combine(Path.GetDirectoryName(Assembly.GetCallingAssembly().CodeBase).Replace("file:\\", "").Replace("file:///", ""), "data");
+
+        private static string TopologyTemplateFile => Path.Combine(TemplatePath, "MRE_Template.aptx");
+        private static string NoTopologyTemplateFile => Path.Combine(TemplatePath, "NoTopo_MRE_Template.aptx");
+
+        private static string TopologyGeodatabaseName => "MRE_Project.gdb";
+        private static string NoTopologyGeodatabaseName => "NoTopo_MRE_Project.gdb";
+
         public string NewProjectName
         {
             get => _newProjectName;
@@ -80,11 +87,22 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             }
         }
 
+        public bool UseTopology
+        {
+            get => _useTopology;
+            set
+            {
+                if(_useTopology == value)
+                    return;
+
+                _useTopology = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ObservableCollection<SpatialReference> UtmSpatialReferences { get; } = new ObservableCollection<SpatialReference>();
-
-        private string DefaultGeodatabaseName => "MRE_Project.gdb";
-
-        private string DefaultGeodatabasePath => Path.Combine(ProjectFolder, NewProjectName, DefaultGeodatabaseName);
+        
+        private string DefaultGeodatabasePath => Path.Combine(ProjectFolder, NewProjectName, UseTopology ? TopologyGeodatabaseName : NoTopologyGeodatabaseName);
 
         #endregion
 
@@ -194,12 +212,17 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             {
                 Name = NewProjectName,
                 LocationPath = ProjectFolder,
-                TemplatePath = TemplateFile
+                TemplatePath = UseTopology ? TopologyTemplateFile : NoTopologyTemplateFile
             };
 
-            var mreProject = await Project.CreateAsync(createProjectSettings);
+            var success = await Project.CreateAsync(createProjectSettings) != null;
+            
+            if(success)
+                Debug.WriteLine($"Project '{NewProjectName}' created. Has pre-made topology? {UseTopology}");
+            else
+                Debug.WriteLine($"FAIL: Could not create project '{NewProjectName}'");
 
-            return mreProject != null;
+            return success;
         }
 
         private async Task SetDefaultGeodatabase()
