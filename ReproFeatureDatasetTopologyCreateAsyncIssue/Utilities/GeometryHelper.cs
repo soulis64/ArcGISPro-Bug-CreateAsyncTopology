@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Editing;
+using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Mapping;
 
 namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
@@ -68,7 +70,12 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
                 editOperation.Create(featureLayer, polygon);
             }
 
-            return editOperation.Execute();
+            var success = editOperation.Execute();
+
+            if(!success)
+                ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show("Edit operation failed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            return success;
         }
     }
 }
