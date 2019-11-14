@@ -138,6 +138,8 @@
     <Compile Include="Utilities\FeatureHelper.cs" />
     <Compile Include="Utilities\GeometryHelper.cs" />
     <Compile Include="Utilities\RandomExtensions.cs" />
+    <Compile Include="Utilities\TopologyManager.cs" />
+    <Compile Include="Utilities\TopologyRules.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\MRE_Project\Index\MRE_Project\" />

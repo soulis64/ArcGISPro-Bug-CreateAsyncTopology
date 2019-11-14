@@ -106,5 +106,16 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
 
             return datasetFeatureLayers.Where(fl => !fl.Name.StartsWith("NonTopology")).ToList();
         }
+
+        /// <summary>
+        /// Gets the feature dataset by name. This method must be called on the MCT. Use QueuedTask.Run.
+        /// </summary>
+        /// <param name="featureDatasetName">The name of the feature dataset to get</param>
+        /// <returns>The feature dataset</returns>
+        public static FeatureDataset GetFeatureDataset(string featureDatasetName)
+        {
+            using(var geodatabase = new Geodatabase(new FileGeodatabaseConnectionPath(new Uri(Project.Current.DefaultGeodatabasePath))))
+                return geodatabase.OpenDataset<FeatureDataset>(featureDatasetName);
+        }
     }
 }

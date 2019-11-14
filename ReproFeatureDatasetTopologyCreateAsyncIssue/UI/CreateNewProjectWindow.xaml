@@ -95,7 +95,7 @@
                     Orientation="Horizontal">
             <CheckBox Content="Include pre-made topology"
                       Style="{DynamicResource Esri_CheckboxToggleSwitch}"
-                      IsChecked="{Binding UseTopology}" />
+                      IsChecked="{Binding UseTopologyTemplate}" />
         </StackPanel>
         <StackPanel Grid.Row="5"
                     Grid.Column="1"

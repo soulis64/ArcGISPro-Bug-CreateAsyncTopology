@@ -21,6 +21,7 @@ using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Controls;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Mapping;
+using ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities;
 
 namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 {
@@ -34,7 +35,7 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
         private string _newProjectName = "New Project";
         private string _projectFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         private SpatialReference _projectSpatialReference;
-        private bool _useTopology;
+        private bool _useTopologyTemplate;
 
         #endregion
 
@@ -48,12 +49,14 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
         private static string TopologyGeodatabaseName => "MRE_Project.gdb";
         private static string NoTopologyGeodatabaseName => "NoTopo_MRE_Project.gdb";
 
+        private static string FeatureDatasetName => "FeatureDataset";
+
         public string NewProjectName
         {
             get => _newProjectName;
             set
             {
-                if(_newProjectName == value)
+                if (_newProjectName == value)
                     return;
 
                 _newProjectName = value;
@@ -66,7 +69,7 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             get => _projectFolder;
             set
             {
-                if(_projectFolder == value)
+                if (_projectFolder == value)
                     return;
 
                 _projectFolder = value;
@@ -79,30 +82,30 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             get => _projectSpatialReference;
             set
             {
-                if(_projectSpatialReference == value)
+                if (_projectSpatialReference == value)
                     return;
-                
+
                 _projectSpatialReference = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool UseTopology
+        public bool UseTopologyTemplate
         {
-            get => _useTopology;
+            get => _useTopologyTemplate;
             set
             {
-                if(_useTopology == value)
+                if (_useTopologyTemplate == value)
                     return;
 
-                _useTopology = value;
+                _useTopologyTemplate = value;
                 OnPropertyChanged();
             }
         }
 
         public ObservableCollection<SpatialReference> UtmSpatialReferences { get; } = new ObservableCollection<SpatialReference>();
-        
-        private string DefaultGeodatabasePath => Path.Combine(ProjectFolder, NewProjectName, UseTopology ? TopologyGeodatabaseName : NoTopologyGeodatabaseName);
+
+        private string DefaultGeodatabasePath => Path.Combine(ProjectFolder, NewProjectName, UseTopologyTemplate ? TopologyGeodatabaseName : NoTopologyGeodatabaseName);
 
         #endregion
 
@@ -122,29 +125,29 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             {
                 var utmSRs = new List<SpatialReference>();
                 //UTM84s for northern hemisphere
-                for(var id = 32601; id <= 32660; id++)
+                for (var id = 32601; id <= 32660; id++)
                     utmSRs.Add(SpatialReferenceBuilder.CreateSpatialReference(id));
 
                 //UTM84s for southern hemisphere
-                for(var id = 32701; id <= 32760; id++)
+                for (var id = 32701; id <= 32760; id++)
                     utmSRs.Add(SpatialReferenceBuilder.CreateSpatialReference(id));
 
                 return utmSRs;
             });
             UtmSpatialReferences.AddRange(utms);
 
-            if(UtmSpatialReferences.Count > 0)
+            if (UtmSpatialReferences.Count > 0)
                 cboCoordinateSystem.SelectedIndex = 0;
         }
 
         private async Task CreateNewProject()
         {
-            if(await CreateProject())
+            if (await CreateProject())
             {
                 await SetDefaultGeodatabase();
 
                 await UpdateCoordinateSystem();
-                
+
                 await UpdateMapProjection();
 
                 await RemoveProjectCreatedDatabase();
@@ -153,9 +156,51 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 
                 await ZoomToExtents();
 
+                if (!UseTopologyTemplate)
+                    await CreateFullTopology();
+
                 await Project.Current.SaveAsync();
             }
         }
+
+        private async Task CreateFullTopology()
+        {
+            await CreateTopology();
+
+            await AddFeatureClassesToTopology();
+        }
+
+        private async Task CreateTopology()
+        {
+            var success = await QueuedTask.Run(() =>
+            {
+                using (var featureDataset = FeatureHelper.GetFeatureDataset(FeatureDatasetName))
+                    return TopologyManager.Default.CreateTopology(featureDataset);
+            });
+
+            if (success)
+                Debug.WriteLine($"Topology {TopologyManager.Default.TopologyName} created.");
+            else
+                Debug.WriteLine($"FAIL: Could not create topology {FeatureDatasetName}_Topology.");
+        }
+
+        private async Task AddFeatureClassesToTopology()
+        {
+            var topologyLayers = await QueuedTask.Run(FeatureHelper.GetTopologyFeatureLayers);
+
+            foreach (var topologyLayer in topologyLayers)
+            {
+                var temp = topologyLayer.URI;
+
+                var success = await QueuedTask.Run(() => TopologyManager.Default.AddFeatureClassToTopology(topologyLayer.GetFeatureClass()));
+
+                if (success)
+                    Debug.WriteLine($"Feature class {topologyLayer.Name} added to topology {TopologyManager.Default.TopologyName}");
+                else
+                    Debug.WriteLine($"FAIL: Could not add feature class {topologyLayer.Name} to topology {TopologyManager.Default.TopologyName}");
+            }
+        }
+
 
         private async Task RemoveProjectCreatedDatabase()
         {
@@ -163,9 +208,10 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 
             GDBProjectItem geodatabaseItemToRemove = null;
 
-            IEnumerable<GDBProjectItem> gdbProjectItems = Project.Current.GetItems<GDBProjectItem>();
+            var gdbProjectItems = Project.Current.GetItems<GDBProjectItem>();
 
-            await QueuedTask.Run(() => {
+            await QueuedTask.Run(() =>
+            {
                 foreach (var gdbProjectItem in gdbProjectItems)
                 {
                     using (var datastore = gdbProjectItem.GetDatastore())
@@ -184,9 +230,11 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             });
 
             //Found it so remove it
-            if(geodatabaseItemToRemove != null)
+            if (geodatabaseItemToRemove != null)
             {
-                if(await QueuedTask.Run(() => Project.Current.RemoveItem(geodatabaseItemToRemove)))
+                var success = await QueuedTask.Run(() => Project.Current.RemoveItem(geodatabaseItemToRemove));
+
+                if (success)
                     Debug.WriteLine($"File geodatabase {geodatabaseItemToRemove} removed.");
                 else
                     Debug.WriteLine($"FAIL: Could not remove file geodatabase {geodatabaseItemToRemove}.");
@@ -200,7 +248,9 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 
             var args = await QueuedTask.Run(() => Geoprocessing.MakeValueArray(esriGeodatabaseFullPath));
 
-            if(!(await Geoprocessing.ExecuteToolAsync("management.Delete", args)).IsFailed)
+            var success = !(await Geoprocessing.ExecuteToolAsync("management.Delete", args)).IsFailed;
+
+            if (success)
                 Debug.WriteLine($"File geodatabase {esriGeodatabaseName} deleted");
             else
                 Debug.WriteLine($"FAIL: Could not delete file geodatabase {esriGeodatabaseName}");
@@ -212,13 +262,13 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             {
                 Name = NewProjectName,
                 LocationPath = ProjectFolder,
-                TemplatePath = UseTopology ? TopologyTemplateFile : NoTopologyTemplateFile
+                TemplatePath = UseTopologyTemplate ? TopologyTemplateFile : NoTopologyTemplateFile
             };
 
             var success = await Project.CreateAsync(createProjectSettings) != null;
-            
-            if(success)
-                Debug.WriteLine($"Project '{NewProjectName}' created. Has pre-made topology? {UseTopology}");
+
+            if (success)
+                Debug.WriteLine($"Project '{NewProjectName}' created. Has pre-made topology? {UseTopologyTemplate}");
             else
                 Debug.WriteLine($"FAIL: Could not create project '{NewProjectName}'");
 
@@ -235,8 +285,8 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
         {
             // Update for all the feature classes in the geodatabase
             Debug.WriteLine($"Update Feature Dataset projection success? {await UpdateFeatureDatasetProjection()}");
-            
-            foreach(var successTuple in await UpdateFeatureClassProjection())
+
+            foreach (var successTuple in await UpdateFeatureClassProjection())
                 Debug.WriteLine($"Update {successTuple.FeatureClassName} projection success? {successTuple.Success}");
         }
 
@@ -244,12 +294,19 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
         {
             var gpArgs = await QueuedTask.Run(() =>
             {
-                using(var geodatabase = new Geodatabase(new FileGeodatabaseConnectionPath(new Uri(Project.Current.DefaultGeodatabasePath))))
-                using(var featureDataset = geodatabase.OpenDataset<FeatureDataset>("FeatureDataset"))
+                using (var geodatabase = new Geodatabase(new FileGeodatabaseConnectionPath(new Uri(Project.Current.DefaultGeodatabasePath))))
+                using (var featureDataset = geodatabase.OpenDataset<FeatureDataset>(FeatureDatasetName))
                     return Geoprocessing.MakeValueArray(featureDataset, ProjectSpatialReference);
             });
 
-            return !(await Geoprocessing.ExecuteToolAsync("management.DefineProjection", gpArgs, null, null, null, GPExecuteToolFlags.None)).IsFailed;
+            var success = !(await Geoprocessing.ExecuteToolAsync("management.DefineProjection", gpArgs, null, null, null, GPExecuteToolFlags.None)).IsFailed;
+
+            if (success)
+                Debug.WriteLine($"Updated Feature Dataset '{FeatureDatasetName}' projection");
+            else
+                Debug.WriteLine($"FAIL: Could not update project for Feature Dataset '{FeatureDatasetName}'");
+
+            return success;
         }
 
         private async Task<List<(bool Success, string FeatureClassName)>> UpdateFeatureClassProjection()
@@ -266,12 +323,12 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
                     try
                     {
                         foreach (var featureClassDefinition in fcDefinitions)
-                            using(var featureClass = geodatabase.OpenDataset<FeatureClass>(featureClassDefinition.GetName()))
+                            using (var featureClass = geodatabase.OpenDataset<FeatureClass>(featureClassDefinition.GetName()))
                                 valueArrays.Add(Geoprocessing.MakeValueArray(featureClass, ProjectSpatialReference));
                     }
                     finally
                     {
-                        foreach (var fcDefinition in fcDefinitions) 
+                        foreach (var fcDefinition in fcDefinitions)
                             fcDefinition?.Dispose();
                     }
                 }
@@ -279,12 +336,16 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
                 return valueArrays;
             });
 
-            foreach(var gpArg in gpArgs) 
-                successList.Add((!(await Geoprocessing.ExecuteToolAsync("management.DefineProjection", gpArg, null, null, null, GPExecuteToolFlags.None)).IsFailed, gpArg[0]));
+            foreach (var gpArg in gpArgs)
+            {
+                var success = !(await Geoprocessing.ExecuteToolAsync("management.DefineProjection", gpArg, null, null, null, GPExecuteToolFlags.None)).IsFailed;
+
+                successList.Add((success, gpArg[0]));
+            }
 
             return successList;
         }
-        
+
         private async Task UpdateMapProjection()
         {
             var mapProjectItems = Project.Current.GetItems<MapProjectItem>().ToList();
@@ -304,7 +365,7 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
                 return Task.WhenAll(createMapPaneTasks);
             });
 
-            foreach(var result in results)
+            foreach (var result in results)
             {
                 Debug.WriteLine($"Map {result.Caption} opened.");
             }
@@ -332,10 +393,10 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
                 Filter = ItemFilters.folders
             };
 
-            if(openItemDialog.ShowDialog() != true)
+            if (openItemDialog.ShowDialog() != true)
                 return;
 
-            if(openItemDialog.Items.Any())
+            if (openItemDialog.Items.Any())
                 ProjectFolder = openItemDialog.Items.First().Path;
         }
 
