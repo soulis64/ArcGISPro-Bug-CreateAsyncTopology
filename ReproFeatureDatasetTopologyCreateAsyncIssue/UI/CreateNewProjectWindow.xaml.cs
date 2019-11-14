@@ -168,6 +168,8 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             await CreateTopology();
 
             await AddFeatureClassesToTopology();
+
+            await CreateTopologyRules();
         }
 
         private async Task CreateTopology()
@@ -190,8 +192,6 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
 
             foreach (var topologyLayer in topologyLayers)
             {
-                var temp = topologyLayer.URI;
-
                 var success = await QueuedTask.Run(() => TopologyManager.Default.AddFeatureClassToTopology(topologyLayer.GetFeatureClass()));
 
                 if (success)
@@ -201,6 +201,25 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.UI
             }
         }
 
+        private async Task CreateTopologyRules()
+        {
+            var topologyLayers = await QueuedTask.Run(FeatureHelper.GetTopologyFeatureLayers);
+
+            foreach(var topologyLayer in topologyLayers)
+            {
+                var mustNotHaveGapsSuccess = await QueuedTask.Run(() => TopologyManager.Default.AddRuleToTopology(TopologyRules.Polygon.MustNotHaveGaps, topologyLayer.GetFeatureClass()));
+
+                if (mustNotHaveGapsSuccess)
+                    Debug.WriteLine($"Topology rule '{TopologyRules.Polygon.MustNotHaveGaps}' added for feature class '{topologyLayer.Name}'");
+                else
+                    Debug.WriteLine($"FAIL: Could not add topology rule '{TopologyRules.Polygon.MustNotHaveGaps}' for feature class '{topologyLayer.Name}'");
+            }
+            
+            var parentLayer = topologyLayers.First(tl => tl.Name.StartsWith("Parent", StringComparison.OrdinalIgnoreCase));
+            var childLayer = topologyLayers.First(tl => tl.Name.StartsWith("Child", StringComparison.OrdinalIgnoreCase));
+
+
+        }
 
         private async Task RemoveProjectCreatedDatabase()
         {

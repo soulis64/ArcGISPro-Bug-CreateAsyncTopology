@@ -70,7 +70,7 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
 
             var datasetPath = Path.Combine(featureDataset.GetDatastore().GetPath().LocalPath, featureDataset.GetName());
             var args = clusterTolerance == null ? Geoprocessing.MakeValueArray(featureDataset, topologyName) : Geoprocessing.MakeValueArray(featureDataset, topologyName, clusterTolerance);
-
+            
             var result = await Geoprocessing.ExecuteToolAsync(CreateTopologyTool, args);
 
             if (!result.IsFailed)
@@ -172,8 +172,21 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
             if (!TopologyRules.AllRules.Contains(ruleType))
                 throw new ArgumentException($"{ruleType} is an invalid rule type", nameof(ruleType));
 
-            var argList = new List<object> { TopologyPath, featureClass1 };
+            var argList = new List<object> { TopologyPath, ruleType, featureClass1 };
 
+            if(subtype1 != null)
+            {
+                argList.Add(subtype1);
+
+                if(featureClass2 != null)
+                {
+                    argList.Add(featureClass2);
+
+                    if (!string.IsNullOrWhiteSpace(subtype2))
+                        argList.Add(subtype2);
+                }
+            }
+            
             if(subtype1 == null && featureClass2 != null)
             {
                 subtype1 = string.Empty;
@@ -183,7 +196,7 @@ namespace ReproFeatureDatasetTopologyCreateAsyncIssue.Utilities
                     argList.Add(subtype2);
             }
 
-            var args = Geoprocessing.MakeValueArray(argList);
+            var args = Geoprocessing.MakeValueArray(argList.ToArray());
 
             var result = await Geoprocessing.ExecuteToolAsync(AddRuleToTopologyTool, args);
 
