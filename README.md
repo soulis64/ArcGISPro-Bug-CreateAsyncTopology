@@ -11,13 +11,14 @@ In a project created using Project.CreateAsync() and a project template that inc
 **Note**: The bug appears to occur intermittently, so if it does not appear in first project created, try creating another to trigger it. Additionally, the bug is only present when the project is newly created. Closing ArcGIS Pro and reopening the project allows features to be created.
 
 ## Reproduction Steps
-Given:
+### Given (included in the MRE)
  - A file geodatabase with a topology containing at least 1 feature class
  - A project template that includes the file geodatabase
  - An add-in that contains tools for: 
    - Creating a project using Project.CreateAsync() and the project template
    - Creating features for the topology-contained feature class using EditOperation.Create()
- 
+
+### Steps
 1. Click the 'Create New Project' button in the 'Repro Issue' ribbon tab
 1. Enter a project name, pick a destination and coordinate system
 1. Click the 'Create Non-Dataset Features' button
@@ -36,3 +37,6 @@ Given:
  - GPU: NVIDIA GeForce GTX 1070
  - ArcGIS Pro 2.4.1
  - MRE is targeting .NET 4.6.2
+
+## The Workaround
+The workaround functions by creating the topology after the new project is created, which seems to circumvent the issue.
